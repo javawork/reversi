@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C++ Express 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "reversi", "reversi\reversi.vcxproj", "{5EEF7CD1-2390-42D2-A3AB-0ED8081B07A4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E189A0A1-AD77-4C1E-A1D6-34D7593C1448}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E189A0A1-AD77-4C1E-A1D6-34D7593C1448}.Debug|Win32.Build.0 = Debug|Win32
+		{E189A0A1-AD77-4C1E-A1D6-34D7593C1448}.Release|Win32.ActiveCfg = Release|Win32
+		{E189A0A1-AD77-4C1E-A1D6-34D7593C1448}.Release|Win32.Build.0 = Release|Win32
+		{017E5087-BE32-4505-9351-5FA06F37443A}.Debug|Win32.ActiveCfg = Debug|Win32
+		{017E5087-BE32-4505-9351-5FA06F37443A}.Debug|Win32.Build.0 = Debug|Win32
+		{017E5087-BE32-4505-9351-5FA06F37443A}.Release|Win32.ActiveCfg = Release|Win32
+		{017E5087-BE32-4505-9351-5FA06F37443A}.Release|Win32.Build.0 = Release|Win32
+		{5EEF7CD1-2390-42D2-A3AB-0ED8081B07A4}.Debug|Win32.ActiveCfg = Debug|Win32
+		{5EEF7CD1-2390-42D2-A3AB-0ED8081B07A4}.Debug|Win32.Build.0 = Debug|Win32
+		{5EEF7CD1-2390-42D2-A3AB-0ED8081B07A4}.Release|Win32.ActiveCfg = Release|Win32
+		{5EEF7CD1-2390-42D2-A3AB-0ED8081B07A4}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
