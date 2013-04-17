@@ -1,0 +1,35 @@
+package packet;
+
+enum MessageType {
+    C_LOGIN = 0;
+    S_LOGIN = 1;
+	S_START = 2;
+	C_SET_PIECE = 3;
+	S_SET_PIECE = 4;
+	S_END = 5;
+}
+
+message C_Login {
+}
+
+message S_Login {
+	required int32 id = 1;
+}
+
+message S_Start {
+	required int32 your_piece = 1;
+}
+
+message C_SetPiece {
+	required int32 pos_index = 1;
+}
+
+message S_SetPiece {
+	required int32 piece = 1;
+	required int32 pos_index = 2;
+	repeated int32 piece_list = 3;
+}
+
+message S_End {
+	required int32 winner_id = 1;
+}
