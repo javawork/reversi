@@ -2,29 +2,26 @@
 
 #include <wx/wx.h>
 #include "board.h"
-#include <boost/thread.hpp>
+#include "packetlistener.h"
 
-class MySocket;
+class MySession;
 
-class MyFrame : public wxFrame
+class MyFrame : public wxFrame, public PacketListener
 {
 public:
-    MyFrame(const wxString& title);
+    MyFrame(const wxString& title, MySession * session);
+	~MyFrame();
 
 	void OnPaint(wxPaintEvent & event);
 	void OnClick(wxMouseEvent & event);
-	void OnClick_(wxMouseEvent & event);
 	void OnTimer(wxTimerEvent& event);
-	void recv_thread();
+	void OnWorkerEvent(wxThreadEvent& event);
 
-protected:
-	void draw_line(wxPaintDC & dc, const SquareList & list);
-	void draw_piece(wxPaintDC & dc, const SquareList & list);
+	virtual void OnReceive(const char * buffer, const size_t len);
 
 private:
 	Board board_;
 	wxTimer timer_;
-	MySocket * socket_;
-	boost::thread    m_Thread;  
+	MySession * session_;
 };
 

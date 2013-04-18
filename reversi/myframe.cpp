@@ -1,7 +1,11 @@
 #include "myframe.h"
-#include "mysocket.h"
 #include <boost/date_time.hpp>
+#include "mysession.h"
 
+#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
+#include <google/protobuf/text_format.h>
+#include "../common/packet.pb.h"
+#include "../common/common.h"
 
 static wxColour Color_Green = wxColour( 34, 139, 34 );
 static wxColour Color_Khaki = wxColour( 240, 230, 140 );
@@ -10,6 +14,7 @@ static wxColour Color_Blue = wxColour( 0, 0, 255 );
 static wxColour Color_Black = wxColour( 0, 0, 0 );
 
 const int TIMER_ID = 101;
+const int WORKER_EVENT = wxID_HIGHEST+1;   // this one gets sent from MyWorkerThread
 
 static void ShowMessageBox( const wxString& message )
 {
@@ -18,74 +23,54 @@ static void ShowMessageBox( const wxString& message )
 	dlg.Destroy();
 }
 
+static void draw_square(wxPaintDC & dc, const SquareList & list);
+static void draw_piece(wxPaintDC & dc, const SquareList & list);
 
-MyFrame::MyFrame(const wxString& title)
+
+MyFrame::MyFrame(const wxString& title, MySession * session)
        : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(380, 400))
 	   , timer_(this, TIMER_ID)
+	   , session_(session)
 {
-	/*wxPanel *panel = new wxPanel(this, wxID_ANY);
-
-	wxButton *button = new wxButton(panel, wxID_EXIT, wxT("Quit"), wxPoint(20, 20));
-	Connect(wxID_EXIT, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(Simple::OnQuit));
-	Centre();*/
 	board_.init();
 	this->Connect(wxEVT_PAINT, wxPaintEventHandler(MyFrame::OnPaint));
 	this->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MyFrame::OnClick));
-	//this->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MyFrame::OnClick_));
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(MyFrame::OnTimer));
-	
-	socket_ = new MySocket();
-	socket_->connect("192.168.0.69", "10000");
-	socket_->send_login();
-	socket_->recv_login();
-	ShowMessageBox("Login");
+	this->Connect(WORKER_EVENT, wxEVT_THREAD, wxThreadEventHandler(MyFrame::OnWorkerEvent));
+	this->SetDoubleBuffered(true);
+	timer_.Start(1000);
+}
 
-	socket_->recv_startgame();
-	//socket_->set_recv_timeout();
-
-	ShowMessageBox("Start Game");
-	timer_.Start(2000);
-	m_Thread = boost::thread(&MyFrame::recv_thread, this);  
-	m_Thread.detach();
+MyFrame::~MyFrame()
+{
 }
 
 void MyFrame::OnPaint(wxPaintEvent& event)
 {
 	wxPaintDC dc(this);
 	const SquareList & square_list = board_.get_square_list();
-	this->draw_line(dc, square_list);
-	this->draw_piece(dc, square_list);
+	draw_square(dc, square_list);
+	draw_piece(dc, square_list);
 }
 
-void MyFrame::draw_line(wxPaintDC & dc, const SquareList & list)
+static void draw_square(wxPaintDC & dc, const SquareList & list)
 {
-	int start_x = size_square;
-	int start_y = size_square;
 	SquareList::const_iterator iter = list.begin();
 	for ( ; iter != list.end(); ++iter)
 	{
 		Square s = (*iter);
-		if (s.index%max_square == max_square-1)
-		{
-			dc.DrawLine( wxPoint(0, start_y), wxPoint(s.x, s.y) );
-			start_y += size_square;
-		}
-		else if (s.index > 28)
-		{
-			dc.DrawLine( wxPoint(start_x, 0), wxPoint(s.x, s.y) );
-			start_x += size_square;
-		}
-
-		dc.DrawLine( wxPoint(size_square*max_square, 0), wxPoint(size_square*max_square, size_square*max_square) );
+		dc.SetBrush( *wxTRANSPARENT_BRUSH );
+		dc.DrawRectangle(s.x - size_square, s.y - size_square, size_square, size_square);
 	}
 }
 
-void MyFrame::draw_piece(wxPaintDC & dc, const SquareList & list)
+static void draw_piece(wxPaintDC & dc, const SquareList & list)
 {
 	SquareList::const_iterator iter = list.begin();
 	for ( ; iter != list.end(); ++iter)
 	{
 		Square s = (*iter);
+		dc.SetPen( wxPen(Color_Black, 0) );
 		if ( s.own == Piece_None)
 		{
 			continue;
@@ -100,6 +85,12 @@ void MyFrame::draw_piece(wxPaintDC & dc, const SquareList & list)
 			dc.SetBrush( Color_Red );
 			dc.DrawCircle(s.x-(size_square/2), s.y-(size_square/2), 20);
 		}
+		else if ( s.own == Piece_Dark_)
+		{
+			dc.SetPen( wxPen(Color_Khaki, 5) );
+			dc.SetBrush( Color_Red );
+			dc.DrawCircle(s.x-(size_square/2), s.y-(size_square/2), 20);
+		}
 	}
 }
 
@@ -110,21 +101,29 @@ void MyFrame::OnClick(wxMouseEvent & event)
 	int index = board_.get_matched_index( x, y );
 	if (invalid_index != index)
 	{
-		board_.change_piece(index, Piece_Dark);
-		socket_->send_setpiece(index);
-		this->Refresh();
-	}
-	event.Skip();
-}
+		board_.change_piece(index, Piece_Dark_);
+		//session_->write("lalala", strlen("lalala"));
+		/////////////////////////////
 
-void MyFrame::OnClick_(wxMouseEvent & event)
-{
-	const int x = event.GetPosition().x;
-	const int y = event.GetPosition().y;
-	const int index = board_.get_matched_index( x, y );
-	if (invalid_index != index)
-	{
-		board_.change_piece(index, Piece_White);
+		//using namespace google;
+		//packet::C_SetPiece pkt;
+		//pkt.set_pos_index(index);
+		//int body_size = pkt.ByteSize();
+		//char* body_buf = new char[body_size];
+
+		//// 버퍼에 직렬화
+		//protobuf::io::ArrayOutputStream os(body_buf, body_size);
+		//pkt.SerializeToZeroCopyStream(&os);
+
+		//PacketHeader * header = new PacketHeader();
+		//header->size = body_size;
+		//header->code = packet::C_SET_PIECE;
+
+		//boost::asio::const_buffer * header_buffer = new boost::asio::const_buffer(header, sizeof(PacketHeader));
+		//boost::asio::const_buffer * body_buffer = new boost::asio::const_buffer(body_buf, body_size);
+		////////////////////////////
+
+
 		this->Refresh();
 	}
 	event.Skip();
@@ -132,20 +131,32 @@ void MyFrame::OnClick_(wxMouseEvent & event)
 
 void MyFrame::OnTimer(wxTimerEvent& event)
 {
-	//const int index = socket_->recv_setpiece();
-	//board_.change_piece(index, Piece_Dark);
+	if ( board_.update_piece() )
+	{
+		this->Refresh();
+	}
+}
+
+void MyFrame::OnWorkerEvent(wxThreadEvent& event)
+{
 	this->Refresh();
 }
 
-void MyFrame::recv_thread()
+void MyFrame::OnReceive(const char * buffer, const size_t len)
 {
-	while(true)
-	{
-		boost::posix_time::seconds workTime(2);  
-       
-	    // Pretend to do something useful...  
-		boost::this_thread::sleep(workTime);  
-		const int index = socket_->recv_setpiece();
-		board_.change_piece(index, Piece_White);
-	}
+	wxThreadEvent thread_event(wxEVT_THREAD, WORKER_EVENT);
+	//thread_event.SetInt(0);
+	wxQueueEvent( this, thread_event.Clone() );
+
+	//PacketHeader header;
+	//memcpy( &header, buffer, sizeof(PacketHeader) );
+	//if ( header.code == packet::S_SET_PIECE )
+	//{
+	//	packet::S_SetPiece pkt;
+	//	using namespace google;
+	//	protobuf::io::ArrayInputStream is(&buffer[sizeof(PacketHeader)], len-sizeof(PacketHeader));
+	//	pkt.ParseFromZeroCopyStream(&is);
+
+	//	board_.change_piece(pkt.index(), Piece_Dark);
+	//}
 }
