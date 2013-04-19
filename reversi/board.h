@@ -7,6 +7,7 @@ enum
 	Piece_None,
 	Piece_White,
 	Piece_Dark,
+	Piece_Dark_,
 };
 
 struct Square
@@ -94,7 +95,21 @@ public:
 		}
 	}
 
-
+	bool update_piece()
+	{
+		bool updated = false;
+		SquareList::iterator iter = square_list_.begin();
+		for ( ; iter != square_list_.end(); ++iter)
+		{
+			if (iter->own == Piece_Dark_)
+			{
+				iter->own = Piece_Dark;
+				updated = true;
+			}
+		}
+		return updated;
+	}
+	
 	void print()
 	{
 #if 0

@@ -6,8 +6,9 @@ struct PacketHeader
 	short code;
 };
 
-enum PieceType {
-	PT_None = 0,
-	PT_O = 1,
-	PT_X = 2,
+enum PieceType 
+{
+	PT_None,
+	PT_White,
+	PT_Dark,
 };

@@ -1,21 +1,23 @@
 #pragma once
 
-#include "packetlistener.h"
-
-class MySession_Impl;
+class PacketListener;
 
 class MySession
 {
 public:
-	MySession(void);
-	~MySession(void);
+	MySession();
+	~MySession();
 
 	void connect( const char * ip, const int port );
-	void write(const short packet_code, const char * body, const size_t body_len);
-
+	void write(const char * p, const size_t len);
 	void set_listener(PacketListener * listener);
 
 private:
-	MySession_Impl * impl_;
+	void do_read();
+	void do_write( const char * p, const size_t len );
+
+private:
+	struct MySession_Impl * impl_;
+	PacketListener * listener_;
 };
 
