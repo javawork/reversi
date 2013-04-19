@@ -73,20 +73,20 @@ void CRoom::TryStartGame()
 
 	int iCenter = BOARD_SIZE/2;
 
-	m_Board[iCenter-1][iCenter-1] = PT_O;
-	m_Board[iCenter][iCenter-1] = PT_X;
-	m_Board[iCenter-1][iCenter] = PT_X;
-	m_Board[iCenter][iCenter] = PT_O;
+	m_Board[iCenter-1][iCenter-1] = PT_White;
+	m_Board[iCenter][iCenter-1] = PT_Dark;
+	m_Board[iCenter-1][iCenter] = PT_Dark;
+	m_Board[iCenter][iCenter] = PT_White;
 
 	::packet::S_Start StartInfo;
-	StartInfo.set_your_piece(PT_X); 
+	StartInfo.set_your_piece(PT_Dark); 
 
 	CSendPacket Packet;
 	Packet.SetID( packet::S_START );
 	Packet.PackProtoBuf( &StartInfo );
 	m_Session[0]->Send(Packet);
 
-	StartInfo.set_your_piece(PT_O);
+	StartInfo.set_your_piece(PT_White);
 	Packet.Init();
 	Packet.SetID( packet::S_START );
 	Packet.PackProtoBuf( &StartInfo );
@@ -235,12 +235,12 @@ void CRoom::SetNextTurn()
 {
 	if( GameState::GameState_Black_Turn == m_GameState )
 	{
-		if( true == ExistPutableSpace( PieceType::PT_O ) )
+		if( true == ExistPutableSpace( PieceType::PT_White ) )
 		{
 			m_GameState = GameState::GameState_White_Trun;
 			return;
 		}
-		else if( true == ExistPutableSpace( PieceType::PT_X ) )
+		else if( true == ExistPutableSpace( PieceType::PT_Dark ) )
 		{
 			m_GameState = GameState::GameState_Black_Turn;
 			return;
@@ -248,12 +248,12 @@ void CRoom::SetNextTurn()
 	}
 	else if( GameState::GameState_White_Trun == m_GameState )
 	{
-		if( true == ExistPutableSpace( PieceType::PT_X ) )
+		if( true == ExistPutableSpace( PieceType::PT_Dark ) )
 		{
 			m_GameState = GameState::GameState_Black_Turn;
 			return;
 		}
-		else if( true == ExistPutableSpace( PieceType::PT_O ) )
+		else if( true == ExistPutableSpace( PieceType::PT_White ) )
 		{
 			m_GameState = GameState::GameState_White_Trun;
 			return;
@@ -264,7 +264,7 @@ void CRoom::SetNextTurn()
 
 void CRoom::SetGameEnd()
 {
-	int iCount[PieceType::PT_X+1]; 
+	int iCount[PieceType::PT_Dark+1]; 
 
 	for( int i = 0 ; i < BOARD_SIZE*BOARD_SIZE ; ++i )
 	{
@@ -273,11 +273,11 @@ void CRoom::SetGameEnd()
 
 	::packet::S_End ProtoBuf;
 	
-	if( iCount[PieceType::PT_O] > iCount[PieceType::PT_X] )
+	if( iCount[PieceType::PT_White] > iCount[PieceType::PT_Dark] )
 	{
 		ProtoBuf.set_winner_id(1);
 	}
-	else if( iCount[PieceType::PT_O] < iCount[PieceType::PT_X] )
+	else if( iCount[PieceType::PT_White] < iCount[PieceType::PT_Dark] )
 	{
 		ProtoBuf.set_winner_id(0);
 	}
