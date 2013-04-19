@@ -1,4 +1,13 @@
 #pragma once
+
+namespace google
+{
+	namespace protobuf
+	{
+		class Message;
+	}
+}
+
 class CSendPacket
 {
 public:
@@ -7,7 +16,7 @@ public:
 
 	void Init();
 	void SetID(USHORT Id);
-	bool AddBody(const char* pBody, int iSize);
+	bool PackProtoBuf(::google::protobuf::Message *pMsg);
 
 	const char* GetPacket();
 	int GetPacketSize();

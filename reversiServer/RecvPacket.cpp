@@ -1,6 +1,7 @@
 #include "StdAfx.h"
 #include "RecvPacket.h"
-
+#include "common/packet.pb.h"
+#include <google/protobuf/io/zero_copy_stream_impl_lite.h>
 
 CRecvPacket::CRecvPacket(void)
 {
@@ -26,3 +27,16 @@ bool CRecvPacket::CheckRecvHeader()		//check recv size header
 	return true;
 }
 
+bool CRecvPacket::UnpackProtoBuf(::google::protobuf::Message *pMsg)
+{
+	if( nullptr == pMsg )
+		return false;
+
+	if( GetBodySize() <= Protocol_Position_Of_Id )
+		return false;
+
+	::google::protobuf::io::ArrayInputStream is(GetBodyBuffer(), GetBodySize()-Protocol_Position_Of_Id);
+	pMsg->ParseFromZeroCopyStream(&is);
+
+	return true;
+}

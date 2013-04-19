@@ -1,6 +1,6 @@
 #include "StdAfx.h"
 #include "ReversySession.h"
-#include "protocol.h"
+#include "Common/Packet.pb.h"
 #include "Room.h"
 
 CRoom g_Room;			//임시
@@ -101,32 +101,42 @@ void CReversySession::ProcessPacket()
 	std::cout<< "Recv packet" << std::endl;
 	switch(m_RecvPacket.GetId())
 	{
-	case PROTOCOL_ID::C_Login:			Process_Login();			break;
-	case PROTOCOL_ID::C_SetPiece:		Process_SetPiece();			break;
+	case packet::C_LOGIN:			Process_Login();			break;
+	case packet::C_SET_PIECE:		Process_SetPiece();			break;
 	};
 }
 
 
 void CReversySession::Process_Login()
 {
+	int iID = g_Room.EnterSession(this);
+	if( -1 == iID )
+	{
+		//fail to enter the room
+		m_socket.close();
+		return;
+	}
+
+	packet::S_Login src_login;
+	src_login.set_id(iID);			//id번호 뭘로?
+
 	CSendPacket Packet;
-	Packet.SetID( PROTOCOL_ID::S_Login );
+	Packet.SetID( packet::S_LOGIN );
+	Packet.PackProtoBuf( &src_login );
+	
 	Send(Packet);
 
-	g_Room.EnterSession(this);
-
-	//if( true == g_Room.EnterSession(this) )
-	//{
-	//	return;
-	//}
+	g_Room.TryStartGame();
 	
-	//m_socket.close();
 }
 
 void CReversySession::Process_SetPiece()
 {
-	CSendPacket Packet;
-	Packet.SetID( PROTOCOL_ID::S_SetPiece );
-	Packet.AddBody(m_RecvPacket.GetBodyBuffer(), m_RecvPacket.GetBodySize());
-	g_Room.BroadcastExceptMe(Packet, this);
+	packet::C_SetPiece SetPieceInfo;
+	m_RecvPacket.UnpackProtoBuf(&SetPieceInfo);
+
+	int iPosX = SetPieceInfo.pos_index() % BOARD_SIZE;
+	int iPosY = SetPieceInfo.pos_index() / BOARD_SIZE;
+
+	g_Room.SetPiece(iPosX, iPosY, this);
 }

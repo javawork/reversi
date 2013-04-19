@@ -13,9 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Packet">
+      <UniqueIdentifier>{71069000-b8d2-4ead-bff1-a5f5e5de67c7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="ReadMe.txt" />
+    <None Include="..\common\packet.proto">
+      <Filter>Packet</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -33,14 +39,17 @@
     <ClInclude Include="ReversySession.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\common\common.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\common\packet.pb.h">
+      <Filter>Packet</Filter>
+    </ClInclude>
     <ClInclude Include="RecvPacket.h">
-      <Filter>Header Files</Filter>
+      <Filter>Packet</Filter>
     </ClInclude>
     <ClInclude Include="SendPacket.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="protocol.h">
-      <Filter>Header Files</Filter>
+      <Filter>Packet</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -59,11 +68,14 @@
     <ClCompile Include="ReversySession.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\common\packet.pb.cc">
+      <Filter>Packet</Filter>
+    </ClCompile>
     <ClCompile Include="RecvPacket.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Packet</Filter>
     </ClCompile>
     <ClCompile Include="SendPacket.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Packet</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

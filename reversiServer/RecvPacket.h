@@ -1,4 +1,13 @@
 #pragma once
+
+namespace google
+{
+	namespace protobuf
+	{
+		class Message;
+	}
+}
+
 class CRecvPacket
 {
 public:
@@ -12,8 +21,8 @@ public:
 	USHORT GetBodySize();			//body size
 	USHORT GetId();
 
-	bool CheckRecvHeader();		//check recv header
-
+	bool CheckRecvHeader();			//check recv header
+	bool UnpackProtoBuf(::google::protobuf::Message *pMsg);
 
 protected:
 	char m_Buffer[MAX_PACKET_SIZE];

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SendPacket.h"
+#include "common/common.h"
 
 class CReversySession;
 class CReversyServer;
@@ -20,41 +21,38 @@ public:
 
 	enum GameState
 	{
-		GameState_White_Trun,
 		GameState_Black_Turn,
+		GameState_White_Trun,
 		GameState_Stop
-	};
-
-	enum Stone
-	{
-		Stone_None,
-		Stone_White,
-		Stone_Black
 	};
 
 	void Init();
 
-	bool EnterSession(CReversySession* Session);
+	int  EnterSession(CReversySession* Session);
 	void LeaveSession(CReversySession* Session);
 
-	void StartGame();
+	void TryStartGame();
 	void StopGame();
-	bool ChangeStone(int x, int y, CReversySession* Session);
+	bool SetPiece(int x, int y, CReversySession* Session);
 
 	void Broadcast(CSendPacket& Packet);
 	void BroadcastExceptMe(CSendPacket& Packet, CReversySession* Session);
+
 protected:
-	void CheckChangedStone(int x, int y);
-	bool RecordChangedStone(int x, int y, int moveX, int moveY);
-	void ChangeStone();
+	void CheckChangedPiece(int x, int y, PieceType iPieceType, std::vector< int >& outArr);
+	void RecordChangedPiece(int x, int y, int moveX, int moveY, PieceType iPieceType, std::vector< int >& outArr);
+	void ChangePiece(PieceType iPieceType, std::vector< int >& outArr);
+	bool ExistPutableSpace(PieceType iPieceType);
+
+	void SetNextTurn();
+	void SetGameEnd();
 
 protected:
 	RoomState m_RoomState;
 	GameState m_GameState;
 
 	CReversySession* m_Session[2];
-	std::vector< int > m_HistoryChangedStone;
-	int m_Board[BOARD_SIZE][BOARD_SIZE];
+	PieceType m_Board[BOARD_SIZE][BOARD_SIZE];
 
 };
 
