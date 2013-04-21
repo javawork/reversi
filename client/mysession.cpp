@@ -3,6 +3,7 @@
 #include <boost/asio.hpp>
 #include <boost/thread/thread.hpp>
 #include "packetlistener.h"
+#include "../common/common.h"
 
 using boost::asio::ip::tcp;
 
@@ -78,16 +79,16 @@ void MySession::connect( const char * ip, const int port )
 	impl_->worker = new boost::thread(boost::bind(&boost::asio::io_service::run, &impl_->io_service));
 }
 
-void MySession::write(const char * p, const size_t len)
+void MySession::write(const short packet_code, const char * buf, const size_t len)
 {
 	char * write_ptr = new char[len];
-	memcpy(write_ptr, p, len);
+	memcpy(write_ptr, buf, len);
 
 	impl_->io_service.post
 	(
-		[this, write_ptr, len]()
+		[this, packet_code, write_ptr, len]()
 		{
-			this->do_write(write_ptr, len);
+			this->do_write(packet_code, write_ptr, len);
 		}
 	);
 }
@@ -116,17 +117,33 @@ void MySession::do_read()
 	);
 }
 
-void MySession::do_write( const char * p, const size_t len )
+void MySession::do_write(const short packet_code, const char * buf, const size_t len)
 {
-	impl_->socket.async_write_some
+	const int header_size = sizeof(PacketHeader);
+	char * header_buf = new char[header_size];
+	PacketHeader header;
+	header.size = len;
+	header.code = packet_code;
+	memcpy(header_buf, &header, header_size);
+
+	char * body_buf = new char[len];
+	memcpy(body_buf, buf, len);
+	
+	std::vector<boost::asio::const_buffer> buffer_list;
+	buffer_list.push_back( boost::asio::const_buffer(header_buf, header_size) );
+	buffer_list.push_back( boost::asio::const_buffer(body_buf, len) );
+
+	boost::asio::async_write
 	(
-		boost::asio::buffer(p, len),
-		[this, p](const boost::system::error_code & error, std::size_t bytes_transferred)
+		impl_->socket,
+		buffer_list,
+		[this, header_buf, body_buf](const boost::system::error_code & error, std::size_t bytes_transferred)
 		{
 			if (false == error)
 			{
 				std::cout << "do_write : " << bytes_transferred << std::endl;
-				delete [] p;
+				delete [] header_buf;
+				delete [] body_buf;
 			}
 			else
 			{

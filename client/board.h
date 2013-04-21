@@ -1,14 +1,7 @@
 #pragma once
 
 #include <vector>
-
-enum
-{
-	Piece_None,
-	Piece_White,
-	Piece_Dark,
-	Piece_Dark_,
-};
+#include "../common/common.h"
 
 struct Square
 {
@@ -16,6 +9,7 @@ struct Square
 	int y;
 	int index;
 	int own;
+	bool blink;
 };
 
 const int max_square = 6;
@@ -43,7 +37,8 @@ public:
 				s.x = (x+1)*size_square;
 				s.y = (y+1)*size_square;
 				s.index = index;
-				s.own = Piece_None;
+				s.own = PT_None;
+				s.blink = false;
 				square_list_.push_back(s);
 				++index;
 			}
@@ -82,28 +77,32 @@ public:
 		return invalid_index;
 	}
 
-	void change_piece(const int index, const int piece)
+	void change_piece(const int index, const int piece, const bool blink)
 	{
 		SquareList::iterator iter = square_list_.begin();
 		for ( ; iter != square_list_.end(); ++iter)
 		{
 			if (iter->index == index)
 			{
+				if ( iter->own == piece)
+					return;
+
 				iter->own = piece;
+				iter->blink = blink;
 				return;
 			}
 		}
 	}
 
-	bool update_piece()
+	bool update_blink()
 	{
 		bool updated = false;
 		SquareList::iterator iter = square_list_.begin();
 		for ( ; iter != square_list_.end(); ++iter)
 		{
-			if (iter->own == Piece_Dark_)
+			if (iter->blink)
 			{
-				iter->own = Piece_Dark;
+				iter->blink = false;
 				updated = true;
 			}
 		}
@@ -124,7 +123,29 @@ public:
 #endif
 	}
 
+	void set_myid(const int id)
+	{
+		myid_ = id;
+	}
+
+	int get_myid()
+	{
+		return myid_;
+	}
+
+	void set_mypt(const int pt)
+	{
+		mypt_ = pt;
+	}
+
+	int get_mypt()
+	{
+		return mypt_;
+	}
+
 private:
 	SquareList square_list_;
+	int myid_;
+	int mypt_;
 
 };
