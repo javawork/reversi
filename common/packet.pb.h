@@ -281,6 +281,18 @@ class S_Start : public ::google::protobuf::Message {
   inline ::google::protobuf::int32 your_piece() const;
   inline void set_your_piece(::google::protobuf::int32 value);
 
+  // repeated int32 piece_list = 2;
+  inline int piece_list_size() const;
+  inline void clear_piece_list();
+  static const int kPieceListFieldNumber = 2;
+  inline ::google::protobuf::int32 piece_list(int index) const;
+  inline void set_piece_list(int index, ::google::protobuf::int32 value);
+  inline void add_piece_list(::google::protobuf::int32 value);
+  inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+      piece_list() const;
+  inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+      mutable_piece_list();
+
   // @@protoc_insertion_point(class_scope:packet.S_Start)
  private:
   inline void set_has_your_piece();
@@ -288,10 +300,11 @@ class S_Start : public ::google::protobuf::Message {
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
+  ::google::protobuf::RepeatedField< ::google::protobuf::int32 > piece_list_;
   ::google::protobuf::int32 your_piece_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(1 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
 
   friend void  protobuf_AddDesc_packet_2eproto();
   friend void protobuf_AssignDesc_packet_2eproto();
@@ -626,6 +639,31 @@ inline ::google::protobuf::int32 S_Start::your_piece() const {
 inline void S_Start::set_your_piece(::google::protobuf::int32 value) {
   set_has_your_piece();
   your_piece_ = value;
+}
+
+// repeated int32 piece_list = 2;
+inline int S_Start::piece_list_size() const {
+  return piece_list_.size();
+}
+inline void S_Start::clear_piece_list() {
+  piece_list_.Clear();
+}
+inline ::google::protobuf::int32 S_Start::piece_list(int index) const {
+  return piece_list_.Get(index);
+}
+inline void S_Start::set_piece_list(int index, ::google::protobuf::int32 value) {
+  piece_list_.Set(index, value);
+}
+inline void S_Start::add_piece_list(::google::protobuf::int32 value) {
+  piece_list_.Add(value);
+}
+inline const ::google::protobuf::RepeatedField< ::google::protobuf::int32 >&
+S_Start::piece_list() const {
+  return piece_list_;
+}
+inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
+S_Start::mutable_piece_list() {
+  return &piece_list_;
 }
 
 // -------------------------------------------------------------------

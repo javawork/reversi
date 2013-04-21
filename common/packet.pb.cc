@@ -79,8 +79,9 @@ void protobuf_AssignDesc_packet_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(S_Login));
   S_Start_descriptor_ = file->message_type(2);
-  static const int S_Start_offsets_[1] = {
+  static const int S_Start_offsets_[2] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(S_Start, your_piece_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(S_Start, piece_list_),
   };
   S_Start_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -192,13 +193,14 @@ void protobuf_AddDesc_packet_2eproto() {
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\014packet.proto\022\006packet\"\t\n\007C_Login\"\025\n\007S_L"
-    "ogin\022\n\n\002id\030\001 \002(\005\"\035\n\007S_Start\022\022\n\nyour_piec"
-    "e\030\001 \002(\005\"\037\n\nC_SetPiece\022\021\n\tpos_index\030\001 \002(\005"
-    "\"B\n\nS_SetPiece\022\r\n\005piece\030\001 \002(\005\022\021\n\tpos_ind"
-    "ex\030\002 \002(\005\022\022\n\npiece_list\030\003 \003(\005\"\032\n\005S_End\022\021\n"
-    "\twinner_id\030\001 \002(\005*a\n\013MessageType\022\013\n\007C_LOG"
-    "IN\020\000\022\013\n\007S_LOGIN\020\001\022\013\n\007S_START\020\002\022\017\n\013C_SET_"
-    "PIECE\020\003\022\017\n\013S_SET_PIECE\020\004\022\t\n\005S_END\020\005", 315);
+    "ogin\022\n\n\002id\030\001 \002(\005\"1\n\007S_Start\022\022\n\nyour_piec"
+    "e\030\001 \002(\005\022\022\n\npiece_list\030\002 \003(\005\"\037\n\nC_SetPiec"
+    "e\022\021\n\tpos_index\030\001 \002(\005\"B\n\nS_SetPiece\022\r\n\005pi"
+    "ece\030\001 \002(\005\022\021\n\tpos_index\030\002 \002(\005\022\022\n\npiece_li"
+    "st\030\003 \003(\005\"\032\n\005S_End\022\021\n\twinner_id\030\001 \002(\005*a\n\013"
+    "MessageType\022\013\n\007C_LOGIN\020\000\022\013\n\007S_LOGIN\020\001\022\013\n"
+    "\007S_START\020\002\022\017\n\013C_SET_PIECE\020\003\022\017\n\013S_SET_PIE"
+    "CE\020\004\022\t\n\005S_END\020\005", 335);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "packet.proto", &protobuf_RegisterTypes);
   C_Login::default_instance_ = new C_Login();
@@ -610,6 +612,7 @@ void S_Login::Swap(S_Login* other) {
 
 #ifndef _MSC_VER
 const int S_Start::kYourPieceFieldNumber;
+const int S_Start::kPieceListFieldNumber;
 #endif  // !_MSC_VER
 
 S_Start::S_Start()
@@ -666,6 +669,7 @@ void S_Start::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     your_piece_ = 0;
   }
+  piece_list_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
 }
@@ -687,6 +691,28 @@ bool S_Start::MergePartialFromCodedStream(
         } else {
           goto handle_uninterpreted;
         }
+        if (input->ExpectTag(16)) goto parse_piece_list;
+        break;
+      }
+
+      // repeated int32 piece_list = 2;
+      case 2: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_piece_list:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadRepeatedPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 1, 16, input, this->mutable_piece_list())));
+        } else if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag)
+                   == ::google::protobuf::internal::WireFormatLite::
+                      WIRETYPE_LENGTH_DELIMITED) {
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPackedPrimitiveNoInline<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, this->mutable_piece_list())));
+        } else {
+          goto handle_uninterpreted;
+        }
+        if (input->ExpectTag(16)) goto parse_piece_list;
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -714,6 +740,12 @@ void S_Start::SerializeWithCachedSizes(
     ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->your_piece(), output);
   }
 
+  // repeated int32 piece_list = 2;
+  for (int i = 0; i < this->piece_list_size(); i++) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(
+      2, this->piece_list(i), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -725,6 +757,12 @@ void S_Start::SerializeWithCachedSizes(
   // required int32 your_piece = 1;
   if (has_your_piece()) {
     target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->your_piece(), target);
+  }
+
+  // repeated int32 piece_list = 2;
+  for (int i = 0; i < this->piece_list_size(); i++) {
+    target = ::google::protobuf::internal::WireFormatLite::
+      WriteInt32ToArray(2, this->piece_list(i), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -746,6 +784,16 @@ int S_Start::ByteSize() const {
     }
 
   }
+  // repeated int32 piece_list = 2;
+  {
+    int data_size = 0;
+    for (int i = 0; i < this->piece_list_size(); i++) {
+      data_size += ::google::protobuf::internal::WireFormatLite::
+        Int32Size(this->piece_list(i));
+    }
+    total_size += 1 * this->piece_list_size() + data_size;
+  }
+
   if (!unknown_fields().empty()) {
     total_size +=
       ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
@@ -771,6 +819,7 @@ void S_Start::MergeFrom(const ::google::protobuf::Message& from) {
 
 void S_Start::MergeFrom(const S_Start& from) {
   GOOGLE_CHECK_NE(&from, this);
+  piece_list_.MergeFrom(from.piece_list_);
   if (from._has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     if (from.has_your_piece()) {
       set_your_piece(from.your_piece());
@@ -800,6 +849,7 @@ bool S_Start::IsInitialized() const {
 void S_Start::Swap(S_Start* other) {
   if (other != this) {
     std::swap(your_piece_, other->your_piece_);
+    piece_list_.Swap(&other->piece_list_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
