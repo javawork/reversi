@@ -29,6 +29,7 @@ message S_SetPiece {
 	required int32 piece = 1;
 	required int32 pos_index = 2;
 	repeated int32 piece_list = 3;
+	required int32 next_turn = 4;
 }
 
 message S_End {

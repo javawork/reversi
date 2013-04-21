@@ -110,10 +110,11 @@ void protobuf_AssignDesc_packet_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(C_SetPiece));
   S_SetPiece_descriptor_ = file->message_type(4);
-  static const int S_SetPiece_offsets_[3] = {
+  static const int S_SetPiece_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(S_SetPiece, piece_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(S_SetPiece, pos_index_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(S_SetPiece, piece_list_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(S_SetPiece, next_turn_),
   };
   S_SetPiece_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -195,12 +196,12 @@ void protobuf_AddDesc_packet_2eproto() {
     "\n\014packet.proto\022\006packet\"\t\n\007C_Login\"\025\n\007S_L"
     "ogin\022\n\n\002id\030\001 \002(\005\"1\n\007S_Start\022\022\n\nyour_piec"
     "e\030\001 \002(\005\022\022\n\npiece_list\030\002 \003(\005\"\037\n\nC_SetPiec"
-    "e\022\021\n\tpos_index\030\001 \002(\005\"B\n\nS_SetPiece\022\r\n\005pi"
+    "e\022\021\n\tpos_index\030\001 \002(\005\"U\n\nS_SetPiece\022\r\n\005pi"
     "ece\030\001 \002(\005\022\021\n\tpos_index\030\002 \002(\005\022\022\n\npiece_li"
-    "st\030\003 \003(\005\"\032\n\005S_End\022\021\n\twinner_id\030\001 \002(\005*a\n\013"
-    "MessageType\022\013\n\007C_LOGIN\020\000\022\013\n\007S_LOGIN\020\001\022\013\n"
-    "\007S_START\020\002\022\017\n\013C_SET_PIECE\020\003\022\017\n\013S_SET_PIE"
-    "CE\020\004\022\t\n\005S_END\020\005", 335);
+    "st\030\003 \003(\005\022\021\n\tnext_turn\030\004 \002(\005\"\032\n\005S_End\022\021\n\t"
+    "winner_id\030\001 \002(\005*a\n\013MessageType\022\013\n\007C_LOGI"
+    "N\020\000\022\013\n\007S_LOGIN\020\001\022\013\n\007S_START\020\002\022\017\n\013C_SET_P"
+    "IECE\020\003\022\017\n\013S_SET_PIECE\020\004\022\t\n\005S_END\020\005", 354);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "packet.proto", &protobuf_RegisterTypes);
   C_Login::default_instance_ = new C_Login();
@@ -1080,6 +1081,7 @@ void C_SetPiece::Swap(C_SetPiece* other) {
 const int S_SetPiece::kPieceFieldNumber;
 const int S_SetPiece::kPosIndexFieldNumber;
 const int S_SetPiece::kPieceListFieldNumber;
+const int S_SetPiece::kNextTurnFieldNumber;
 #endif  // !_MSC_VER
 
 S_SetPiece::S_SetPiece()
@@ -1100,6 +1102,7 @@ void S_SetPiece::SharedCtor() {
   _cached_size_ = 0;
   piece_ = 0;
   pos_index_ = 0;
+  next_turn_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1137,6 +1140,7 @@ void S_SetPiece::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     piece_ = 0;
     pos_index_ = 0;
+    next_turn_ = 0;
   }
   piece_list_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1198,6 +1202,22 @@ bool S_SetPiece::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(24)) goto parse_piece_list;
+        if (input->ExpectTag(32)) goto parse_next_turn;
+        break;
+      }
+
+      // required int32 next_turn = 4;
+      case 4: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_next_turn:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &next_turn_)));
+          set_has_next_turn();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -1236,6 +1256,11 @@ void S_SetPiece::SerializeWithCachedSizes(
       3, this->piece_list(i), output);
   }
 
+  // required int32 next_turn = 4;
+  if (has_next_turn()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(4, this->next_turn(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1258,6 +1283,11 @@ void S_SetPiece::SerializeWithCachedSizes(
   for (int i = 0; i < this->piece_list_size(); i++) {
     target = ::google::protobuf::internal::WireFormatLite::
       WriteInt32ToArray(3, this->piece_list(i), target);
+  }
+
+  // required int32 next_turn = 4;
+  if (has_next_turn()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(4, this->next_turn(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -1283,6 +1313,13 @@ int S_SetPiece::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->pos_index());
+    }
+
+    // required int32 next_turn = 4;
+    if (has_next_turn()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->next_turn());
     }
 
   }
@@ -1329,6 +1366,9 @@ void S_SetPiece::MergeFrom(const S_SetPiece& from) {
     if (from.has_pos_index()) {
       set_pos_index(from.pos_index());
     }
+    if (from.has_next_turn()) {
+      set_next_turn(from.next_turn());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1346,7 +1386,7 @@ void S_SetPiece::CopyFrom(const S_SetPiece& from) {
 }
 
 bool S_SetPiece::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000003) != 0x00000003) return false;
+  if ((_has_bits_[0] & 0x0000000b) != 0x0000000b) return false;
 
   return true;
 }
@@ -1356,6 +1396,7 @@ void S_SetPiece::Swap(S_SetPiece* other) {
     std::swap(piece_, other->piece_);
     std::swap(pos_index_, other->pos_index_);
     piece_list_.Swap(&other->piece_list_);
+    std::swap(next_turn_, other->next_turn_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);

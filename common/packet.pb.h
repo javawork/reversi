@@ -477,21 +477,31 @@ class S_SetPiece : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
       mutable_piece_list();
 
+  // required int32 next_turn = 4;
+  inline bool has_next_turn() const;
+  inline void clear_next_turn();
+  static const int kNextTurnFieldNumber = 4;
+  inline ::google::protobuf::int32 next_turn() const;
+  inline void set_next_turn(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:packet.S_SetPiece)
  private:
   inline void set_has_piece();
   inline void clear_has_piece();
   inline void set_has_pos_index();
   inline void clear_has_pos_index();
+  inline void set_has_next_turn();
+  inline void clear_has_next_turn();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::int32 piece_;
   ::google::protobuf::int32 pos_index_;
   ::google::protobuf::RepeatedField< ::google::protobuf::int32 > piece_list_;
+  ::google::protobuf::int32 next_turn_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(4 + 31) / 32];
 
   friend void  protobuf_AddDesc_packet_2eproto();
   friend void protobuf_AssignDesc_packet_2eproto();
@@ -763,6 +773,28 @@ S_SetPiece::piece_list() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
 S_SetPiece::mutable_piece_list() {
   return &piece_list_;
+}
+
+// required int32 next_turn = 4;
+inline bool S_SetPiece::has_next_turn() const {
+  return (_has_bits_[0] & 0x00000008u) != 0;
+}
+inline void S_SetPiece::set_has_next_turn() {
+  _has_bits_[0] |= 0x00000008u;
+}
+inline void S_SetPiece::clear_has_next_turn() {
+  _has_bits_[0] &= ~0x00000008u;
+}
+inline void S_SetPiece::clear_next_turn() {
+  next_turn_ = 0;
+  clear_has_next_turn();
+}
+inline ::google::protobuf::int32 S_SetPiece::next_turn() const {
+  return next_turn_;
+}
+inline void S_SetPiece::set_next_turn(::google::protobuf::int32 value) {
+  set_has_next_turn();
+  next_turn_ = value;
 }
 
 // -------------------------------------------------------------------
