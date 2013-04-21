@@ -10,11 +10,18 @@ IMPLEMENT_APP(MyApp)
 
 bool MyApp::OnInit()
 {
+	//_CrtSetBreakAlloc(141);
 	_CrtDumpMemoryLeaks();
 
 	session_ = NULL;
 	session_ = new MySession();
-	session_->connect( "192.168.0.163", 10000 );
+
+	const int host_size = 32;
+	char host[host_size] = {0,};
+	GetPrivateProfileStringA("Reversi", "host", "0.0.0.0", host, host_size, "./Client.ini");
+	const int port = GetPrivateProfileIntA("Reversi", "port", 0, "./Client.ini");
+
+	session_->connect( host, port );
     MyFrame * myframe = new MyFrame( wxT("reversi"), session_ );
 	session_->set_listener( myframe );
     myframe->Show( true );
