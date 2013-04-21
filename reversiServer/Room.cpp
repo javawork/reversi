@@ -43,13 +43,13 @@ int CRoom::EnterSession(CReversySession* Session)
 	return iRet;
 }
 
-void CRoom::LeaveSession(CReversySession* Session)
+void CRoom::LeaveSession(CReversySession* pSession)
 {
-	if( Session == m_Session[0] )
+	if( pSession == m_Session[0] )
 	{
 		m_Session[0] = nullptr;
 	}
-	else if( Session == m_Session[1] )
+	else if( pSession == m_Session[1] )
 	{
 		m_Session[1] = nullptr;
 	}
@@ -64,7 +64,7 @@ void CRoom::LeaveSession(CReversySession* Session)
 
 void CRoom::TryStartGame()
 {
-	if( !m_Session[0] && !m_Session[1] )
+	if( !m_Session[0] || !m_Session[1] )
 		return;
 
 	m_RoomState = RoomState_Playing;
@@ -80,6 +80,11 @@ void CRoom::TryStartGame()
 
 	::packet::S_Start StartInfo;
 	StartInfo.set_your_piece(PT_Dark); 
+	for( int i = 0 ; i < BOARD_SIZE*BOARD_SIZE ; ++i )
+	{
+		StartInfo.add_piece_list( ((int*)m_Board)[i] );
+	}
+	StartInfo.set_first_turn(PT_Dark);
 
 	CSendPacket Packet;
 	Packet.SetID( packet::S_START );
@@ -111,27 +116,40 @@ bool CRoom::SetPiece(int x, int y, CReversySession* pSession)
 	if( nullptr == pSession || pSession != m_Session[m_GameState] )
 		return false;
 
+	PieceType iPiece = (GameState::GameState_Black_Turn == m_GameState) ? PT_Dark : PT_White;
+
+
 	if( x < 0 || y < 0 || x >= BOARD_SIZE || y >= BOARD_SIZE )
 		return false;
 
-	std::vector< int > History(BOARD_SIZE*BOARD_SIZE);
+	std::vector< int > History;
 
-	CheckChangedPiece(x, y, (PieceType)m_GameState, History);
+	CheckChangedPiece(x, y, iPiece, History);
 
 	if( History.empty() )
 		return false;
 
+	History.push_back( (y*BOARD_SIZE)+x );
 	//change pieces
-	ChangePiece((PieceType)m_GameState, History);
+	ChangePiece(iPiece, History);
+
+	SetNextTurn();
 
 	//Send SetPiece
 	::packet::S_SetPiece ProtoBuf;
-	ProtoBuf.set_piece( m_GameState );
-	ProtoBuf.set_pos_index( (x*BOARD_SIZE)+y );
+	ProtoBuf.set_piece( iPiece );
+	ProtoBuf.set_pos_index( (y*BOARD_SIZE)+x );
 	
 	for( int i = 0 ; i < BOARD_SIZE*BOARD_SIZE ; ++i )
 	{
 		ProtoBuf.add_piece_list( ((int*)m_Board)[i] );
+	}
+
+	switch( m_GameState )
+	{
+	case GameState::GameState_Black_Turn:	ProtoBuf.set_next_turn(PieceType::PT_Dark);		break;
+	case GameState::GameState_White_Trun:	ProtoBuf.set_next_turn(PieceType::PT_White);	break;
+	default:								ProtoBuf.set_next_turn(PieceType::PT_None);		break;
 	}
 
 	CSendPacket Packet;
@@ -139,8 +157,6 @@ bool CRoom::SetPiece(int x, int y, CReversySession* pSession)
 	Packet.PackProtoBuf( &ProtoBuf );
 
 	Broadcast(Packet);
-
-	SetNextTurn();
 
 	if( GameState::GameState_Stop == m_GameState )
 		SetGameEnd();
@@ -181,33 +197,37 @@ void CRoom::CheckChangedPiece(int x, int y, PieceType iPieceType, std::vector< i
 
 }
 
-void CRoom::RecordChangedPiece(int x, int y, int moveX, int moveY, PieceType iPieceType, std::vector< int >& outArr)
+bool CRoom::RecordChangedPiece(int x, int y, int moveX, int moveY, PieceType iPieceType, std::vector< int >& outArr)
 {
 	x += moveX;
 	y += moveY;
 
 	if( x < 0 || y < 0 || x >= BOARD_SIZE || y >= BOARD_SIZE )
-		return;
+		return false;
 
-	if( PieceType::PT_None == m_Board[x][y] || iPieceType == m_Board[x][y] )
-		return;
+	if( PieceType::PT_None == m_Board[y][x] )
+		return false;
 
-	outArr.push_back( (y*BOARD_SIZE)+x );
+	if( iPieceType == m_Board[y][x] )
+		return true;
 
-	RecordChangedPiece(x, y, moveX, moveY, iPieceType, outArr);
+	bool bRet = RecordChangedPiece(x, y, moveX, moveY, iPieceType, outArr);
+	if( true == bRet )
+	{	
+		outArr.push_back( (y*BOARD_SIZE)+x );
+	}
+
+	return bRet;
 }
 
 void CRoom::ChangePiece(PieceType iPieceType, std::vector< int >& outArr)
 {
 	auto fnChangePiece = [&](int& iPos)
 	{
-		int x = iPos%BOARD_SIZE;
-		int y = iPos/BOARD_SIZE;
-
 		m_Board[iPos/BOARD_SIZE][iPos%BOARD_SIZE] = iPieceType;
 	};
 
-	std::for_each( (int*)m_Board, (int*)m_Board + (BOARD_SIZE*BOARD_SIZE), fnChangePiece);
+	std::for_each( outArr.begin(), outArr.end(), fnChangePiece);
 }
 
 bool CRoom::ExistPutableSpace(PieceType iPieceType)

@@ -40,7 +40,7 @@ public:
 
 protected:
 	void CheckChangedPiece(int x, int y, PieceType iPieceType, std::vector< int >& outArr);
-	void RecordChangedPiece(int x, int y, int moveX, int moveY, PieceType iPieceType, std::vector< int >& outArr);
+	bool RecordChangedPiece(int x, int y, int moveX, int moveY, PieceType iPieceType, std::vector< int >& outArr);
 	void ChangePiece(PieceType iPieceType, std::vector< int >& outArr);
 	bool ExistPutableSpace(PieceType iPieceType);
 

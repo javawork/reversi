@@ -33,7 +33,7 @@ bool CSendPacket::PackProtoBuf(::google::protobuf::Message *pMsg)
 	::google::protobuf::io::ArrayOutputStream os(m_Buffer+Protocol_Header_Total_Size, bufSize);
 	pMsg->SerializeToZeroCopyStream(&os);
 
-	*(USHORT*)(m_Buffer) = bufSize + Protocol_Position_Of_Id;
+	*(USHORT*)(m_Buffer) = bufSize;
 
 	return true;
 }

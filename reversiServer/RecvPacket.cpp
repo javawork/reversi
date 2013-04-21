@@ -32,10 +32,10 @@ bool CRecvPacket::UnpackProtoBuf(::google::protobuf::Message *pMsg)
 	if( nullptr == pMsg )
 		return false;
 
-	if( GetBodySize() <= Protocol_Position_Of_Id )
+	if( GetBodySize() <= 0 )
 		return false;
 
-	::google::protobuf::io::ArrayInputStream is(GetBodyBuffer(), GetBodySize()-Protocol_Position_Of_Id);
+	::google::protobuf::io::ArrayInputStream is(GetBodyBuffer(), GetBodySize());
 	pMsg->ParseFromZeroCopyStream(&is);
 
 	return true;
