@@ -19,6 +19,7 @@ message S_Login {
 message S_Start {
 	required int32 your_piece = 1;
 	repeated int32 piece_list = 2;
+	required int32 first_turn = 3;
 }
 
 message C_SetPiece {
