@@ -293,18 +293,28 @@ class S_Start : public ::google::protobuf::Message {
   inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
       mutable_piece_list();
 
+  // required int32 first_turn = 3;
+  inline bool has_first_turn() const;
+  inline void clear_first_turn();
+  static const int kFirstTurnFieldNumber = 3;
+  inline ::google::protobuf::int32 first_turn() const;
+  inline void set_first_turn(::google::protobuf::int32 value);
+
   // @@protoc_insertion_point(class_scope:packet.S_Start)
  private:
   inline void set_has_your_piece();
   inline void clear_has_your_piece();
+  inline void set_has_first_turn();
+  inline void clear_has_first_turn();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
   ::google::protobuf::RepeatedField< ::google::protobuf::int32 > piece_list_;
   ::google::protobuf::int32 your_piece_;
+  ::google::protobuf::int32 first_turn_;
 
   mutable int _cached_size_;
-  ::google::protobuf::uint32 _has_bits_[(2 + 31) / 32];
+  ::google::protobuf::uint32 _has_bits_[(3 + 31) / 32];
 
   friend void  protobuf_AddDesc_packet_2eproto();
   friend void protobuf_AssignDesc_packet_2eproto();
@@ -674,6 +684,28 @@ S_Start::piece_list() const {
 inline ::google::protobuf::RepeatedField< ::google::protobuf::int32 >*
 S_Start::mutable_piece_list() {
   return &piece_list_;
+}
+
+// required int32 first_turn = 3;
+inline bool S_Start::has_first_turn() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void S_Start::set_has_first_turn() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void S_Start::clear_has_first_turn() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void S_Start::clear_first_turn() {
+  first_turn_ = 0;
+  clear_has_first_turn();
+}
+inline ::google::protobuf::int32 S_Start::first_turn() const {
+  return first_turn_;
+}
+inline void S_Start::set_first_turn(::google::protobuf::int32 value) {
+  set_has_first_turn();
+  first_turn_ = value;
 }
 
 // -------------------------------------------------------------------

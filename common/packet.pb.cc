@@ -79,9 +79,10 @@ void protobuf_AssignDesc_packet_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(S_Login));
   S_Start_descriptor_ = file->message_type(2);
-  static const int S_Start_offsets_[2] = {
+  static const int S_Start_offsets_[3] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(S_Start, your_piece_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(S_Start, piece_list_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(S_Start, first_turn_),
   };
   S_Start_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -194,14 +195,15 @@ void protobuf_AddDesc_packet_2eproto() {
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\014packet.proto\022\006packet\"\t\n\007C_Login\"\025\n\007S_L"
-    "ogin\022\n\n\002id\030\001 \002(\005\"1\n\007S_Start\022\022\n\nyour_piec"
-    "e\030\001 \002(\005\022\022\n\npiece_list\030\002 \003(\005\"\037\n\nC_SetPiec"
-    "e\022\021\n\tpos_index\030\001 \002(\005\"U\n\nS_SetPiece\022\r\n\005pi"
-    "ece\030\001 \002(\005\022\021\n\tpos_index\030\002 \002(\005\022\022\n\npiece_li"
-    "st\030\003 \003(\005\022\021\n\tnext_turn\030\004 \002(\005\"\032\n\005S_End\022\021\n\t"
-    "winner_id\030\001 \002(\005*a\n\013MessageType\022\013\n\007C_LOGI"
-    "N\020\000\022\013\n\007S_LOGIN\020\001\022\013\n\007S_START\020\002\022\017\n\013C_SET_P"
-    "IECE\020\003\022\017\n\013S_SET_PIECE\020\004\022\t\n\005S_END\020\005", 354);
+    "ogin\022\n\n\002id\030\001 \002(\005\"E\n\007S_Start\022\022\n\nyour_piec"
+    "e\030\001 \002(\005\022\022\n\npiece_list\030\002 \003(\005\022\022\n\nfirst_tur"
+    "n\030\003 \002(\005\"\037\n\nC_SetPiece\022\021\n\tpos_index\030\001 \002(\005"
+    "\"U\n\nS_SetPiece\022\r\n\005piece\030\001 \002(\005\022\021\n\tpos_ind"
+    "ex\030\002 \002(\005\022\022\n\npiece_list\030\003 \003(\005\022\021\n\tnext_tur"
+    "n\030\004 \002(\005\"\032\n\005S_End\022\021\n\twinner_id\030\001 \002(\005*a\n\013M"
+    "essageType\022\013\n\007C_LOGIN\020\000\022\013\n\007S_LOGIN\020\001\022\013\n\007"
+    "S_START\020\002\022\017\n\013C_SET_PIECE\020\003\022\017\n\013S_SET_PIEC"
+    "E\020\004\022\t\n\005S_END\020\005", 374);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "packet.proto", &protobuf_RegisterTypes);
   C_Login::default_instance_ = new C_Login();
@@ -614,6 +616,7 @@ void S_Login::Swap(S_Login* other) {
 #ifndef _MSC_VER
 const int S_Start::kYourPieceFieldNumber;
 const int S_Start::kPieceListFieldNumber;
+const int S_Start::kFirstTurnFieldNumber;
 #endif  // !_MSC_VER
 
 S_Start::S_Start()
@@ -633,6 +636,7 @@ S_Start::S_Start(const S_Start& from)
 void S_Start::SharedCtor() {
   _cached_size_ = 0;
   your_piece_ = 0;
+  first_turn_ = 0;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -669,6 +673,7 @@ S_Start* S_Start::New() const {
 void S_Start::Clear() {
   if (_has_bits_[0 / 32] & (0xffu << (0 % 32))) {
     your_piece_ = 0;
+    first_turn_ = 0;
   }
   piece_list_.Clear();
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -714,6 +719,22 @@ bool S_Start::MergePartialFromCodedStream(
           goto handle_uninterpreted;
         }
         if (input->ExpectTag(16)) goto parse_piece_list;
+        if (input->ExpectTag(24)) goto parse_first_turn;
+        break;
+      }
+
+      // required int32 first_turn = 3;
+      case 3: {
+        if (::google::protobuf::internal::WireFormatLite::GetTagWireType(tag) ==
+            ::google::protobuf::internal::WireFormatLite::WIRETYPE_VARINT) {
+         parse_first_turn:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
+                 input, &first_turn_)));
+          set_has_first_turn();
+        } else {
+          goto handle_uninterpreted;
+        }
         if (input->ExpectAtEnd()) return true;
         break;
       }
@@ -747,6 +768,11 @@ void S_Start::SerializeWithCachedSizes(
       2, this->piece_list(i), output);
   }
 
+  // required int32 first_turn = 3;
+  if (has_first_turn()) {
+    ::google::protobuf::internal::WireFormatLite::WriteInt32(3, this->first_turn(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -766,6 +792,11 @@ void S_Start::SerializeWithCachedSizes(
       WriteInt32ToArray(2, this->piece_list(i), target);
   }
 
+  // required int32 first_turn = 3;
+  if (has_first_turn()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(3, this->first_turn(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -782,6 +813,13 @@ int S_Start::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::Int32Size(
           this->your_piece());
+    }
+
+    // required int32 first_turn = 3;
+    if (has_first_turn()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::Int32Size(
+          this->first_turn());
     }
 
   }
@@ -825,6 +863,9 @@ void S_Start::MergeFrom(const S_Start& from) {
     if (from.has_your_piece()) {
       set_your_piece(from.your_piece());
     }
+    if (from.has_first_turn()) {
+      set_first_turn(from.first_turn());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -842,7 +883,7 @@ void S_Start::CopyFrom(const S_Start& from) {
 }
 
 bool S_Start::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if ((_has_bits_[0] & 0x00000005) != 0x00000005) return false;
 
   return true;
 }
@@ -851,6 +892,7 @@ void S_Start::Swap(S_Start* other) {
   if (other != this) {
     std::swap(your_piece_, other->your_piece_);
     piece_list_.Swap(&other->piece_list_);
+    std::swap(first_turn_, other->first_turn_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
