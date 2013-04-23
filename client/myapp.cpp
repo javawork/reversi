@@ -10,7 +10,7 @@ IMPLEMENT_APP(MyApp)
 
 bool MyApp::OnInit()
 {
-	//_CrtSetBreakAlloc(141);
+	//_CrtSetBreakAlloc(10349);
 	_CrtDumpMemoryLeaks();
 
 	session_ = NULL;

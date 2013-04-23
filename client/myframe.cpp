@@ -1,5 +1,4 @@
 #include "myframe.h"
-//#include <boost/date_time.hpp>
 #include "mysession.h"
 
 #include <google/protobuf/io/zero_copy_stream_impl_lite.h>
@@ -16,10 +15,9 @@ static wxColour Color_PT_Dark = wxColour( 0, 0, 0 );
 
 enum
 {
-	WORKER_EVENT = wxID_HIGHEST+1,
-	ON_LOGIN_MENU,
-	LOGIN_DIALOG_OK,
-	TIMER_ID,
+	REVERSI_THREAD_EVENT = wxID_HIGHEST+1,
+	REVERSI_LOGIN_BUTTON_ID,
+	REVERSI_TIMER_ID,
 };
 
 enum
@@ -44,9 +42,9 @@ LoginDialog::LoginDialog(const wxString & title)
 {
 	wxPanel * panel = new wxPanel(this, -1);
 	m_nick_text = new wxTextCtrl(panel, -1, wxT(""), wxPoint(20, 10));
-	wxButton * okbutton = new wxButton(panel, LOGIN_DIALOG_OK, wxT("ok"), wxPoint(130, 10));
-	this->Connect(LOGIN_DIALOG_OK, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(LoginDialog::OnOk));
-	Centre();
+	wxButton * okbutton = new wxButton(panel, REVERSI_LOGIN_BUTTON_ID, wxT("ok"), wxPoint(130, 10));
+	this->Connect(REVERSI_LOGIN_BUTTON_ID, wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(LoginDialog::OnOk));
+	//Centre();
 	ShowModal();
 }
 
@@ -62,18 +60,19 @@ wxString LoginDialog::GetNickname() const
 
 MyFrame::MyFrame(const wxString& title, MySession * session)
        : wxFrame(NULL, wxID_ANY, title, wxDefaultPosition, wxSize(380, 440))
-	   , timer_(this, TIMER_ID)
+	   , timer_(this, REVERSI_TIMER_ID)
 	   , session_(session)
 {
+	GOOGLE_PROTOBUF_VERIFY_VERSION;
+
 	board_.init();
-	
 	this->Connect(wxEVT_PAINT, wxPaintEventHandler(MyFrame::OnPaint));
 	this->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MyFrame::OnClick));
 	this->Connect(wxEVT_TIMER, wxTimerEventHandler(MyFrame::OnTimer));
-	this->Connect(WORKER_EVENT, wxEVT_THREAD, wxThreadEventHandler(MyFrame::OnWorkerEvent));
+	this->Connect(REVERSI_THREAD_EVENT, wxEVT_THREAD, wxThreadEventHandler(MyFrame::OnWorkerEvent));
 	
 	this->SetDoubleBuffered(true);
-	//timer_.Start(1000);
+
 
 	m_menubar = new wxMenuBar; 
 	m_menu = new wxMenu;
@@ -89,6 +88,7 @@ MyFrame::MyFrame(const wxString& title, MySession * session)
 
 MyFrame::~MyFrame()
 {
+	google::protobuf::ShutdownProtobufLibrary();
 }
 
 void MyFrame::OnPaint(wxPaintEvent& event)
@@ -150,7 +150,6 @@ void MyFrame::OnClick(wxMouseEvent & event)
 	if (invalid_index != index)
 	{
 		/////////////////////////////
-
 		using namespace google;
 		packet::C_SetPiece pkt;
 		pkt.set_pos_index(index);
@@ -163,15 +162,6 @@ void MyFrame::OnClick(wxMouseEvent & event)
 
 		session_->write( packet::C_SET_PIECE, body_buf, body_size );
 		delete [] body_buf;
-
-		//PacketHeader * header = new PacketHeader();
-		//header->size = body_size;
-		//header->code = packet::C_SET_PIECE;
-
-		//boost::asio::const_buffer * header_buffer = new boost::asio::const_buffer(header, sizeof(PacketHeader));
-		//boost::asio::const_buffer * body_buffer = new boost::asio::const_buffer(body_buf, body_size);
-		////////////////////////////
-
 
 		this->Refresh();
 	}
@@ -198,6 +188,8 @@ void MyFrame::OnLoginMenu(wxCommandEvent& event)
 	loginDialog->Show(true);
 	wxString nick = loginDialog->GetNickname();
 
+	delete loginDialog;
+
 	using namespace google;
 	packet::C_Login pkt;
 	const int body_size = pkt.ByteSize();
@@ -212,7 +204,6 @@ void MyFrame::OnLoginMenu(wxCommandEvent& event)
 
 void MyFrame::OnReceive(const char * buffer, const size_t len)
 {
-	wxThreadEvent thread_event(wxEVT_THREAD, WORKER_EVENT);
 	using namespace google;
 	PacketHeader header;
 	memcpy( &header, buffer, sizeof(PacketHeader) );
@@ -256,13 +247,14 @@ void MyFrame::OnReceive(const char * buffer, const size_t len)
 		{
 			this->SetStatusText(wxT("Others turn"), 0);
 		}
+		wxThreadEvent thread_event(wxEVT_THREAD, REVERSI_THREAD_EVENT);
+		wxQueueEvent( this, thread_event.Clone() );
 	}
 	else if ( header.code == packet::S_SET_PIECE )
 	{
 		packet::S_SetPiece pkt;
 		pkt.ParseFromZeroCopyStream(&is);
 
-		//board_.change_piece(pkt.pos_index(), pkt.piece(), true);
 		for (int i = 0; i < pkt.piece_list_size(); ++i)
 		{
 			int piece_type = pkt.piece_list(i);
@@ -278,7 +270,9 @@ void MyFrame::OnReceive(const char * buffer, const size_t len)
 			this->SetStatusText(wxT("Others turn"), 0);
 		}
 
+		wxThreadEvent thread_event(wxEVT_THREAD, REVERSI_THREAD_EVENT);
 		//thread_event.SetInt(pkt.next_turn());
+		wxQueueEvent( this, thread_event.Clone() );
 	}
 	else if ( header.code == packet::S_END )
 	{
@@ -295,6 +289,4 @@ void MyFrame::OnReceive(const char * buffer, const size_t len)
 
 		board_.init();
 	}
-
-	wxQueueEvent( this, thread_event.Clone() );
 }

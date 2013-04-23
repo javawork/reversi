@@ -35,7 +35,7 @@ private:
 	Board board_;
 	wxTimer timer_;
 	MySession * session_;
-	wxMenu *m_menu;
-	wxMenuBar *m_menubar;
+	wxMenu * m_menu;
+	wxMenuBar * m_menubar;
 };
 

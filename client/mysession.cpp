@@ -117,21 +117,18 @@ void MySession::do_read()
 	);
 }
 
-void MySession::do_write(const short packet_code, const char * buf, const size_t len)
+void MySession::do_write(const short packet_code, const char * body_buf, const size_t body_len)
 {
 	const int header_size = sizeof(PacketHeader);
 	char * header_buf = new char[header_size];
 	PacketHeader header;
-	header.size = len;
+	header.size = body_len;
 	header.code = packet_code;
 	memcpy(header_buf, &header, header_size);
 
-	char * body_buf = new char[len];
-	memcpy(body_buf, buf, len);
-	
 	std::vector<boost::asio::const_buffer> buffer_list;
 	buffer_list.push_back( boost::asio::const_buffer(header_buf, header_size) );
-	buffer_list.push_back( boost::asio::const_buffer(body_buf, len) );
+	buffer_list.push_back( boost::asio::const_buffer(body_buf, body_len) );
 
 	boost::asio::async_write
 	(

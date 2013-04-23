@@ -109,20 +109,6 @@ public:
 		return updated;
 	}
 	
-	void print()
-	{
-#if 0
-		Square_List::const_iterator iter = square_list_.begin();
-		for ( ; iter != square_list_.end(); ++iter)
-		{
-			Square s = (*iter);
-			std::cout << "["<< s.x << ", " << s.y << "] ";
-			if (s.index % max_square == max_square-1)
-				std::cout << std::endl;
-		}
-#endif
-	}
-
 	void set_myid(const int id)
 	{
 		myid_ = id;
